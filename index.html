@@ -3,176 +3,162 @@
 <head>
   <meta charset="UTF-8">
   <title>Declaração de Comparecimento</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     * { box-sizing: border-box; }
-    body {
-      font-family: Arial, sans-serif;
-      margin: 30px;
-    }
+    body { font-family: Arial, sans-serif; background: #f4f7fa; margin: 0; padding: 20px; min-height: 100vh; }
+    .cabecalho-banner { background: #000; color: white; text-align: center; padding: 20px; }
+    .cabecalho-banner img { max-width: 120px; height: auto; margin-bottom: 10px; }
+    .cabecalho-banner h1 { margin: 0; font-size: 24px; }
+    .cabecalho-banner p { margin: 5px 0 0 0; font-size: 12px; }
+    form { background: #fff; padding: 20px; max-width: 700px; margin: 30px auto; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    label { display: block; margin-top: 15px; font-weight: bold; }
+    input, select { width: 100%; padding: 8px; margin-top: 5px; font-size: 14px; border-radius: 6px; border: 1px solid #ccc; }
+    button { margin-top: 20px; width: 100%; background: #007bff; color: white; font-size: 16px; padding: 12px; border: none; border-radius: 8px; cursor: pointer; }
+    button:hover { background: #0056b3; }
+    #assinatura-preview img { max-width: 300px; margin-top: 10px; }
 
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 30px;
-      border: 1px solid #000;
-      position: relative;
-      min-height: 1000px;
-    }
-
-    .header, .footer {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .logo {
-      width: 150px;
-      margin: 0 auto 10px;
-      display: block;
-    }
-
-    .form-group {
-      margin-bottom: 15px;
-    }
-
-    label {
-      font-weight: bold;
-    }
-
-    input {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-    }
-
-    .button {
-      margin-top: 30px;
-      text-align: center;
-    }
-
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    .assinatura {
-      text-align: center;
-      margin-top: 150px;
-    }
-
-    .rodape-pdf {
-      position: absolute;
-      bottom: 30px;
-      left: 0;
-      right: 0;
-      text-align: center;
-      font-size: 12px;
-    }
+    /* PDF styles */
+    #pdf-content { display: none; padding: 20px; }
+    .cabecalho-pdf { text-align: center; }
+    .cabecalho-pdf img { max-width: 100px; margin-bottom: 10px; }
+    .cabecalho-pdf p { margin: 2px 0; font-size: 12px; }
+    .titulo-pdf { text-align: center; font-weight: bold; text-transform: uppercase; margin: 30px 0; font-size: 18px; }
+    .texto-declaracao { text-align: justify; margin: 30px 0; font-size: 14px; line-height: 1.6; }
+    .assinatura-operador { text-align: center; margin-top: 40px; font-size: 14px; }
+    .rodape-pdf { text-align: center; font-size: 10px; margin-top: 50px; color: #555; }
   </style>
 </head>
 <body>
 
-  <div class="container" id="formulario">
-    <div class="header">
-      <img class="logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAACG/pytAAAB..." alt="Logo Polícia Penal">
-      <p><strong>
-        GOVERNO DO ESTADO DO AMAPÁ<br>
-        SECRETARIA DE ESTADO DE JUSTIÇA E SEGURANÇA PÚBLICA<br>
-        INSTITUTO DE ADMINISTRAÇÃO PENITENCIÁRIA DO AMAPÁ<br>
-        CENTRAL DE MONITORAMENTO ELETRÔNICO – CME<br>
-        EMAIL: cme.iapen.ap@gmail.com
-      </strong></p>
-      <hr>
-    </div>
+<div class="cabecalho-banner">
+  <img src="logo-pp.png" alt="Logo Polícia Penal">
+  <h1>CENTRAL DE MONITORAMENTO ELETRÔNICO - CME</h1>
+  <p>e-mail: cme.iapen.ap@gmail.com</p>
+</div>
 
-    <div class="form-group">
-      <label>Nome completo do monitorado:</label>
-      <input type="text" id="nome">
-    </div>
+<form id="formulario">
+  <label>Nome completo do monitorado:</label>
+  <input type="text" id="nomeMonitorado" required>
 
-    <div class="form-group">
-      <label>CPF n.º:</label>
-      <input type="text" id="cpf">
-    </div>
+  <label>CPF n.º:</label>
+  <input type="text" id="cpf" maxlength="11" required oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,11)">
 
-    <div class="form-group">
-      <label>Horário de Entrada:</label>
-      <input type="text" id="entrada" onclick="setHoraAtual(this)">
-    </div>
+  <label>Tipo de Atendimento:</label>
+  <select id="tipoAtendimento" required>
+    <option value="" disabled selected>Selecione...</option>
+    <option value="INSPEÇÃO DA TORNOZELEIRA POR PROBLEMA DE CARREGAMENTO">INSPEÇÃO DA TORNOZELEIRA POR PROBLEMA DE CARREGAMENTO</option>
+    <option value="TROCA/SUBSTITUIÇÃO DO CARREGADOR (fonte de alimentação)">TROCA/SUBSTITUIÇÃO DO CARREGADOR (fonte de alimentação)</option>
+    <option value="ATUALIZAÇÃO CADASTRAL - CONTATO TELEFÔNICO">ATUALIZAÇÃO CADASTRAL - CONTATO TELEFÔNICO</option>
+    <option value="TROCA/SUBSTITUIÇÃO DA TORNOZELEIRA">TROCA/SUBSTITUIÇÃO DA TORNOZELEIRA</option>
+    <option value="JUSTIFICATIVA DE SAIDA DE ZONA">JUSTIFICATIVA DE SAIDA DE ZONA</option>
+    <option value="SOLICITAÇÃO DE MUDANÇA DE ENDEREÇO">SOLICITAÇÃO DE MUDANÇA DE ENDEREÇO</option>
+    <option value="ENTREGA DE ATESTADO MÉDICO (realização de exame)">ENTREGA DE ATESTADO MÉDICO (realização de exame)</option>
+    <option value="ENTREGA DE DECLARAÇÃO ESCOLAR">ENTREGA DE DECLARAÇÃO ESCOLAR</option>
+    <option value="ENTREGA DE DECLARAÇÃO DE COMPROVANTE DE TRABALHO">ENTREGA DE DECLARAÇÃO DE COMPROVANTE DE TRABALHO</option>
+  </select>
 
-    <div class="form-group">
-      <label>Horário de Saída:</label>
-      <input type="text" id="saida" onclick="setHoraAtual(this)">
-    </div>
+  <label>Horário de Entrada:</label>
+  <input type="time" id="horaEntrada" required>
 
-    <div class="button">
-      <button onclick="gerarPDF()">Gerar PDF</button>
-    </div>
+  <label>Horário de Saída:</label>
+  <input type="time" id="horaSaida" required>
+
+  <label>Nome do Operador Responsável:</label>
+  <input type="text" id="nomeOperador" required>
+
+  <label>Assinatura (upload da imagem):</label>
+  <input type="file" id="assinatura" accept="image/*">
+  <div id="assinatura-preview"></div>
+
+  <button type="button" onclick="gerarPDF()">Gerar PDF</button>
+</form>
+
+<div id="pdf-content">
+  <div class="cabecalho-pdf">
+    <img src="logo-pp.png" alt="Logo Polícia Penal">
+    <p>GOVERNO DO ESTADO DO AMAPÁ</p>
+    <p>SECRETARIA DE ESTADO DE JUSTIÇA E SEGURANÇA PÚBLICA</p>
+    <p>INSTITUTO DE ADMINISTRAÇÃO PENITENCIÁRIA DO AMAPÁ</p>
+    <p>CENTRAL DE MONITORAMENTO ELETRÔNICO – CME</p>
+    <p>e-mail: cme.iapen.ap@gmail.com</p>
   </div>
 
-  <script>
-    function setHoraAtual(input) {
-      const agora = new Date();
-      const hora = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-      input.value = hora;
-    }
+  <div class="titulo-pdf">Declaração de Comparecimento</div>
 
-    function gerarPDF() {
-      const nome = document.getElementById("nome").value;
-      const cpf = document.getElementById("cpf").value;
-      const entrada = document.getElementById("entrada").value;
-      const saida = document.getElementById("saida").value;
+  <div class="texto-declaracao" id="textoDeclaracao"></div>
 
-      const agora = new Date();
-      const data = agora.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+  <div id="pdf-assinatura" style="text-align:center; margin-top:20px;"></div>
 
-      const conteudo = `
-        <div style="font-family:Arial,sans-serif; padding: 30px; position: relative; min-height: 1000px;">
-          <div style="text-align:center;">
-            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAACG/pytAAAB..." style="width:150px;"><br>
-            <strong>GOVERNO DO ESTADO DO AMAPÁ<br>
-            SECRETARIA DE ESTADO DE JUSTIÇA E SEGURANÇA PÚBLICA<br>
-            INSTITUTO DE ADMINISTRAÇÃO PENITENCIÁRIA DO AMAPÁ<br>
-            CENTRAL DE MONITORAMENTO ELETRÔNICO – CME<br>
-            EMAIL: cme.iapen.ap@gmail.com</strong>
-            <hr>
-          </div>
+  <div class="assinatura-operador" id="assinaturaOperador"></div>
 
-          <h2 style="text-align:center;">DECLARAÇÃO DE COMPARECIMENTO</h2>
+  <div class="rodape-pdf">
+    <p>CENTRAL DE MONITORAMENTO ELETRÔNICO – CME</p>
+    <p>Av. Machado de Assis, 372 – Santa Rita, CEP: 68.901-257</p>
+    <p>Telefone (096) 98415-2844</p>
+  </div>
+</div>
 
-          <p style="text-align:justify;">
-            Declaramos para os devidos fins que o monitorado <strong>${nome}</strong>, CPF nº <strong>${cpf}</strong>,
-            compareceu nesta Central de Monitoramento Eletrônico - CME no horário de <strong>${entrada}</strong> até as <strong>${saida}</strong>,
-            para fins de ATENDIMENTO: INSPEÇÃO DO DISPOSITIVO POR PROBLEMA DE CARREGAMENTO. Sem mais, esta CME encontra-se à disposição, podendo ser contatada nos telefones constantes no rodapé deste expediente.
-          </p>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-          <p style="text-align:right;">Macapá-AP, ${data}.</p>
+<script>
+window.onload = function() {
+  const agora = new Date();
+  const hora = agora.getHours().toString().padStart(2, '0');
+  const minuto = agora.getMinutes().toString().padStart(2, '0');
+  document.getElementById('horaSaida').value = hora + ':' + minuto;
+};
 
-          <div class="assinatura" style="text-align:center; margin-top: 150px;">
-            _________________________________________<br>
-            Operador Responsável
-          </div>
+function gerarPDF() {
+  const nomeMonitorado = document.getElementById('nomeMonitorado').value.trim().toUpperCase();
+  const cpf = document.getElementById('cpf').value;
+  const tipoAtendimento = document.getElementById('tipoAtendimento').value;
+  const horaEntrada = document.getElementById('horaEntrada').value;
+  const horaSaida = document.getElementById('horaSaida').value;
+  const nomeOperador = document.getElementById('nomeOperador').value.trim();
 
-          <div class="rodape-pdf">
-            CENTRAL DE MONITORAMENTO ELETRÔNICO – CME<br>
-            Av. Machado de Assis, 372 – Santa Rita – Macapá – AP, CEP: 68.901-257<br>
-            Telefone (096) 98415-2844
-          </div>
-        </div>
-      `;
+  if (!nomeMonitorado || !cpf || !tipoAtendimento || !horaEntrada || !horaSaida || !nomeOperador) {
+    alert("Preencha todos os campos!");
+    return;
+  }
 
-      const opt = {
-        margin: 10,
-        filename: 'declaracao_comparecimento.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
+  // Preenche os dados no conteúdo do PDF
+  document.getElementById('textoDeclaracao').innerHTML = `
+    Declaramos para os devidos fins que o(a) <strong>${nomeMonitorado}</strong>, CPF n.º <strong>${cpf}</strong>,
+    compareceu nesta CENTRAL DE MONITORAMENTO ELETRÔNICO - CME, no horário de ${horaEntrada}min até ${horaSaida}min,
+    para fins de <strong>ATENDIMENTO:</strong> <strong>${tipoAtendimento}</strong>.<br><br>
+    Sem mais, esta CME encontra-se à disposição, podendo ser contatada no telefone constante no rodapé deste expediente
+    ou ainda pelo e-mail: cme.iapen.ap@gmail.com
+  `;
 
-      html2pdf().from(conteudo).set(opt).save();
-    }
-  </script>
+  document.getElementById('assinaturaOperador').innerHTML = "<strong>Operador Responsável:</strong> " + nomeOperador;
+
+  const assinaturaInput = document.getElementById('assinatura');
+  if (assinaturaInput.files.length > 0) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('pdf-assinatura').innerHTML = '<img src="' + e.target.result + '" style="max-width:300px;">';
+      gerarPDFReal();
+    };
+    reader.readAsDataURL(assinaturaInput.files[0]);
+  } else {
+    gerarPDFReal();
+  }
+}
+
+function gerarPDFReal() {
+  const pdfContent = document.getElementById('pdf-content');
+  pdfContent.style.display = 'block'; // exibe para renderizar
+  const opt = {
+    margin: 10,
+    filename: 'declaracao_comparecimento.pdf',
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+  html2pdf().set(opt).from(pdfContent).save().then(() => {
+    pdfContent.style.display = 'none'; // esconde de novo
+  });
+}
+</script>
 
 </body>
 </html>
