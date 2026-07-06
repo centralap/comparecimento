@@ -238,6 +238,9 @@
     style="display:none; margin-top:10px;"
   >
 
+  <label>Data:</label>
+  <input type="date" id="dataComparecimento" required>
+
   <label>Horário de Entrada:</label>
 
   <input type="time" id="horaEntrada" required>
@@ -307,6 +310,9 @@
 <script>
 
 window.onload = function() {
+  const hoje=new Date();
+  document.getElementById('dataComparecimento').value=hoje.toISOString().split('T')[0];
+
 
   const agora = new Date();
 
@@ -372,6 +378,8 @@ function gerarPDF() {
 
   }
 
+  const dataComparecimento=document.getElementById('dataComparecimento').value;
+  const dataBR=dataComparecimento.split('-').reverse().join('/');
   const horaEntrada =
     document.getElementById('horaEntrada')
     .value;
@@ -404,8 +412,7 @@ function gerarPDF() {
     Declaramos para os devidos fins que o(a)
     <strong>${nomeMonitorado}</strong>,
     CPF n.º <strong>${cpf}</strong>,
-    compareceu nesta CENTRAL DE MONITORAMENTO ELETRÔNICO - CME,
-    no horário de ${horaEntrada}min até ${horaSaida}min,
+    compareceu nesta CENTRAL DE MONITORAMENTO ELETRÔNICO - CME, no dia <strong>${dataBR}</strong>, no horário de <strong>${horaEntrada}</strong> às <strong>${horaSaida}</strong>,
     para fins de <strong>ATENDIMENTO:</strong>
     <strong>${tipoAtendimento}</strong>.
     <br><br>
